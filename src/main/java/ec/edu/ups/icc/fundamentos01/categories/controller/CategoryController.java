@@ -8,6 +8,7 @@ import ec.edu.ups.icc.fundamentos01.categories.service.CategoryService;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,11 +26,19 @@ public class CategoryController {
 
     }
 
-    @PostMapping()
-    public ResponseEntity<String> create(@RequestBody CategoryCreateDto entity) {
+    // @PostMapping()
+    // public ResponseEntity<String> create(@RequestBody CategoryCreateDto entity) {
 
-        categoryService.save(entity);
-        return ResponseEntity.ok("Categoría creada exitosamente");
+    // categoryService.save(entity);
+    // return ResponseEntity.ok("Categoría creada exitosamente");
+    // }
+
+    @PostMapping
+    public ResponseEntity<CategoryResponseDto> create(@RequestBody CategoryCreateDto entity) {
+
+        CategoryResponseDto response = categoryService.save(entity);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping()
