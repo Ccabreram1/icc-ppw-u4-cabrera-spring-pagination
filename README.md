@@ -51,3 +51,14 @@ Crear un script de carga masiva para poblar la base de datos con datos variados:
 ![Muchos](assets/SearchMuchos.png)
 5. Ordenamiento por diferentes campos
 ![Ordenamiento](assets/Ordenamiento.png)
+
+# Modulo 11
+
+## 1. login
+![Login](assets/Login.jpeg)
+
+## 2. register
+![Register](assets/Registrar.jpeg)
+
+## 3. api/users SIN TOKEN 
+![api/users](assets/SinToken.jpeg)

@@ -16,4 +16,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     Optional<ProductEntity> findByName(String name);
 
+    // Verificar si email ya está registrado (usado en registro)
+    boolean existsByEmail(String email);
+
 }
