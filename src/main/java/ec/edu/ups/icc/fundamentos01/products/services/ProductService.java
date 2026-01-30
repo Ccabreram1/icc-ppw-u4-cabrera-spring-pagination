@@ -35,6 +35,4 @@ public interface ProductService {
         Page<ProductResponseDto> findByUserIdWithFilters(Long userId, String name, Double minPrice, Double maxPrice,
                         Long categoryId, int page, int size, String[] sort);
 
-        
-
 }
