@@ -6,6 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -24,6 +26,7 @@ import ec.edu.ups.icc.fundamentos01.products.dtos.UpdateProductDto;
 import ec.edu.ups.icc.fundamentos01.products.dtos.ProductResponseDto;
 
 import ec.edu.ups.icc.fundamentos01.products.services.ProductService;
+import ec.edu.ups.icc.fundamentos01.security.service.UserDetailsImpl;
 import jakarta.validation.Valid;
 
 @RestController
@@ -66,7 +69,6 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
-
     // ============== PAGINACIÓN CON FILTROS (CONTINUANDO TEMA 09) ==============
 
     /**
@@ -84,8 +86,8 @@ public class ProductController {
             @RequestParam(defaultValue = "createdAt") String[] sort) {
 
         Page<ProductResponseDto> products = productService.findWithFilters(
-            name, minPrice, maxPrice, categoryId, page, size, sort);
-        
+                name, minPrice, maxPrice, categoryId, page, size, sort);
+
         return ResponseEntity.ok(products);
     }
 
@@ -107,18 +109,21 @@ public class ProductController {
             @RequestParam(defaultValue = "createdAt") String[] sort) {
 
         Page<ProductResponseDto> products = productService.findByUserIdWithFilters(
-            userId, name, minPrice, maxPrice, categoryId, page, size, sort);
-        
+                userId, name, minPrice, maxPrice, categoryId, page, size, sort);
+
         return ResponseEntity.ok(products);
     }
 
     @PostMapping
-    public ResponseEntity<ProductResponseDto> create(@Valid @RequestBody CreateProductDto dto) {
-        ProductResponseDto created = productService.create(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    public ResponseEntity<ProductResponseDto> create(@Valid @RequestBody
+    CreateProductDto dto) {
+    ProductResponseDto created = productService.create(dto);
+    return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
+
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<ProductResponseDto>> findAll() {
         List<ProductResponseDto> products = productService.findAll();
         return ResponseEntity.ok(products);
@@ -142,17 +147,47 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
+    // @PutMapping("/{id}")
+    // public ResponseEntity<ProductResponseDto> update(
+    //         @PathVariable("id") Long id,
+    //         @Valid @RequestBody UpdateProductDto dto) {
+    //     ProductResponseDto updated = productService.update(id, dto);
+    //     return ResponseEntity.ok(updated);
+    // }
+
+    // @DeleteMapping("/{id}")
+    // public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
+    //     productService.delete(id);
+    //     return ResponseEntity.noContent().build();
+    // }
+    /**
+     * Actualizar producto (solo dueño, ADMIN o MODERATOR)
+     * 
+     * El usuario autenticado se extrae del JWT mediante @AuthenticationPrincipal
+     * y se pasa al servicio para validar ownership
+     */
     @PutMapping("/{id}")
     public ResponseEntity<ProductResponseDto> update(
-            @PathVariable("id") Long id,
-            @Valid @RequestBody UpdateProductDto dto) {
-        ProductResponseDto updated = productService.update(id, dto);
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateProductDto dto,
+            @AuthenticationPrincipal UserDetailsImpl currentUser) {  // ← Usuario del JWT
+        
+        ProductResponseDto updated = productService.update(id, dto, currentUser);
         return ResponseEntity.ok(updated);
     }
 
+    /**
+     * Eliminar producto (solo dueño, ADMIN o MODERATOR)
+     * 
+     * El usuario autenticado se extrae del JWT mediante @AuthenticationPrincipal
+     * y se pasa al servicio para validar ownership
+     */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
-        productService.delete(id);
+    public ResponseEntity<Void> delete(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetailsImpl currentUser) {  // ← Usuario del JWT
+        
+        productService.delete(id, currentUser);
         return ResponseEntity.noContent().build();
     }
 
