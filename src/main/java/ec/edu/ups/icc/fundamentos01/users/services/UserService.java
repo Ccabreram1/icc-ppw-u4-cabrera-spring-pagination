@@ -16,6 +16,7 @@ public interface UserService {
 
     UserResponseDto create(CreateUserDto dto);
 
+
     UserResponseDto update(int id, UpdateUserDto dto);
 
     UserResponseDto partialUpdate(int id, PartialUpdateUserDto dto);
